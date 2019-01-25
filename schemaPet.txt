@@ -1,0 +1,26 @@
+CREATE DATABASE pet_hospital;
+
+
+CREATE TABLE Hospitals (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name varchar(50),
+	location varchar(50)
+);
+
+CREATE TABLE Animals (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name varchar(50),
+	hospital_id INT,
+	owner_id INT,
+	malady_id INT
+);
+
+CREATE TABLE Maladies (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name varchar(50) NOT NULL
+);
+
+CREATE TABLE Owners (
+	id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	name varchar(50) NOT NULL
+);
