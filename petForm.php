@@ -88,15 +88,36 @@
 				$db,
 				$port
 			);
+
     //$link->query("ANY QUERY YOU WANT GOES HERE")
     //can put variable names in quotes without escaping $_POST
-			if ($result = $link->query("SELECT * FROM Animals ")) {
+			if ($result = $link->query("SELECT Animals.id, Animals.name, Hospitals.name, Hospitals.location FROM Animals LEFT JOIN Hospitals ON Animals.hospital_id=Hospitals.id")) {
 				printf("Select returned %d rows.\n", $result->num_rows);
+				$pet = $result;
+				print_r($result->fetch_row());
+				print_r($result->fetch_assoc());
+				echo "<table boarder = '4'>
+				<tr>
+				<th>Pet Name</th>
+				<th>Hospital</th				
+				</tr>";
 
-				print_r($result->fetch_array());
+				while ($row = $result->fetch_row()) {
+					echo "<tr>";
+					print_r($row);
+					foreach ($row as $value) {
+						echo "<td>" . $value . "</td>";
+					}
+					// echo "<td>" . $row['name'] . "</td>";
+					echo "</tr>";
+				}
+				echo "</table>";
+
 
 				$result->close();
 			}
+
+
 			echo '<h1>Contact Form</h1>
       <form action="" method="POST">
         <input type="text" name="petName" placeholder="Pet Name"/><br />
@@ -105,26 +126,49 @@
         <input type="text" name="ownerName" placeholder="Owner Name" /><br />
         <input type="text" name="malady" placeholder="Malady" /><br />
         <button type="submit">Submit</button>
-      </form>';
+			</form>';
+
+			function getAnimals($animal)
+			{
+				$query = "SELECT * FROM Animals WHERE name LIKE '$animal'";
+				return $query;
+
+			}
+
+
 			if ($_POST['petName']) {
 				$petName = htmlspecialchars($_POST['petName']);
-				$query = "INSERT INTO Animals (name) VALUES ('$petName')";
-				if ($result = $link->query($query)) {
-					echo 'Successfully inserted $result->num_rows';
-					$result->close();
-				} else {
-					echo $link->error;
-					echo $query;
+				if ($result = $link->query(getAnimals($petName))) {
+					print_r($result->fetch_assoc());
+					$rows = $result->num_rows;
+					if ($rows == 0) {
+						$query = "INSERT INTO Animals (name) VALUES ('$petName')";
+						if ($result = $link->query($query)) {
+							echo 'Successfully inserted $result->num_rows';
+							$result->close();
+						} else {
+							echo $link->error;
+							echo $query;
+						}
+						echo '<p>
+						Pet name found ' . $_POST['petName'] . '
+						</p>';
+					}
 				}
-				echo '<p>
-			Pet name found ' . $_POST['petName'] . '
-			</p>';
+			}
+
+
+
+			function getHospital($name)
+			{
+				$query = "SELECT * FROM Hospitals WHERE name LIKE '$name'";
+				return $query;
 			}
 
 			if ($_POST['hospitalName']) {
 				$hosName = htmlspecialchars($_POST['hospitalName']);
-				$gethospital = "SELECT * FROM Hospitals WHERE name LIKE '$hosName'";
-				if ($result = $link->query($gethospital)) {
+				// $gethospital = "SELECT * FROM Hospitals WHERE name LIKE '$hosName'";
+				if ($result = $link->query(getHospital($hosName))) {
 					$rows = $result->num_rows;
 					if ($rows == 0) {
 						$query = "INSERT INTO Hospitals (name) VALUES ('$hosName')";
